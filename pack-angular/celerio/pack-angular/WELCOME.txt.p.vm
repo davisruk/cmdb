@@ -1,0 +1,16 @@
+$output.file("WELCOME.TXT")##
+This is a sample 'per project' template.
+
+Templates doc: http://www.jaxio.com/documentation/celerio/templates.html
+
+Here is a simple script:
+#foreach($entity in $project.withoutManyToManyJoinEntities.list)
+
+    ${d}{entity.model.type}: $entity.model.type
+    ${d}{entity.model.var}: $entity.model.var
+    ${d}{entity.model.getter}: $entity.model.getter
+    ${d}{entity.service.type}: $entity.service.type
+    ${d}{entity.service.var}: $entity.service.var
+    ${d}{entity.service.getter}: $entity.service.getter
+#end
+

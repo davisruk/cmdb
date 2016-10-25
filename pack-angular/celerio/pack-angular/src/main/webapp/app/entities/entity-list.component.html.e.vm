@@ -1,0 +1,54 @@
+$output.webapp("app/entities/${entity.model.var}/${entity.model.var}-list.component.html")##
+<p>This list is server-side paginated...</p>
+<div class="ContentSideSections Implementation">
+    <p-dataTable [value]="currentPage.content"
+                 [lazy]="true"
+                 [rows]="10"
+                 [paginator]="currentPage.totalElements > 10"
+                 [totalRecords]="currentPage.totalElements"
+                 (onLazyLoad)="loadPage(${d}event)"
+                 selectionMode="single"
+                 (onRowSelect)="onRowSelect(${d}event)"
+                 [(selection)]="selected${entity.model.type}"
+                 [rowsPerPageOptions]="[5,10,20,50,100]"
+                 [responsive]="true">
+        <header>{{header}} (count: {{currentPage.totalElements}})</header>
+#foreach($attr in $entity.searchResultAttributes.flatUp.list)
+#if ($attr.hasXToOneRelation())
+        <p-column header="$attr.xToOneRelation.to.varUp" sortable="false">
+            <template let-${attr.xToOneRelation.to.var}="rowData['$attr.xToOneRelation.to.var']" pTemplate type="body">
+                <${attr.xToOneRelation.toEntity.model.var}-line [${attr.xToOneRelation.to.var}]="${attr.xToOneRelation.to.var}"></${attr.xToOneRelation.toEntity.model.var}-line>
+            </template>
+        </p-column>
+#else
+        <p-column field="$attr.var" header="$attr.labels.label" sortable="true"></p-column>
+#end
+#end
+        <p-column styleClass="col-icon">
+            <template let-$entity.model.var="rowData" pTemplate type="body">
+                <button type="button" pButton icon="fa-trash" (click)="showDeleteDialog($entity.model.var)" style="float:left"></button>
+            </template>
+        </p-column>
+        <footer>
+            <div class="ui-helper-clearfix" style="width:100%">
+                <button type="button" pButton icon="fa-plus" style="float:left" (click)="addNew()" label="Add"></button>
+            </div>
+        </footer>
+    </p-dataTable>
+
+    <p-dialog header="Delete ${entity.model.type} ?" [(visible)]="displayDeleteDialog" [responsive]="true" showEffect="fade" [modal]="true" closeOnEscape="true" (onAfterHide)="${entity.model.var}ToDelete = null">
+        <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="${entity.model.var}ToDelete">
+#foreach($attr in $entity.searchResultAttributes.flatUp.list)
+            <div class="ui-grid-row" *ngIf="${entity.model.var}ToDelete.${attr.var}">
+                <div class="ui-grid-col-4">${attr.labels.label}:</div>
+                <div class="ui-grid-col-8">{{ ${entity.model.var}ToDelete.${attr.var} }}</div>
+            </div>
+#end
+        </div>
+        <footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <button type="button" pButton icon="fa-trash" (click)="delete()" label="Delete"></button>
+            </div>
+        </footer>
+    </p-dialog>
+</div>
